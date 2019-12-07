@@ -1,5 +1,5 @@
-#include <u.h>
-#include <libc.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 void
 cat(int f, char *s)
