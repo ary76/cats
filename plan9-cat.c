@@ -1,35 +1,49 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+
+FILE* fp;
+char c;
 
 void
-cat(int f, char *s)
+cat(char *s)
 {
-	char buf[8192];
-	long n;
-
-	while((n=read(f, buf, (long)sizeof buf))>0)
-		if(write(1, buf, n)!=n)
-			sysfatal("write error copying %s: %r", s);
-	if(n < 0)
-		sysfatal("error reading %s: %r", s);
+    printf("File name : [%s]\n",s);
+    while((c = fgetc(fp) )!=  EOF) printf("%c",c);
 }
 
 void
 main(int argc, char *argv[])
 {
-	int f, i;
+	int f,j;
+    int i;
 
-	argv0 = "cat";
-	if(argc == 1)
-		cat(0, "<stdin>");
+	if(argc == 1){
+		fprintf(stderr, "Please enter a file name\n");
+        exit(1);
+    }
+
 	else for(i=1; i<argc; i++){
-		f = open(argv[i], OREAD);
-		if(f < 0)
-			sysfatal("can't open %s: %r", argv[i]);
+        
+        j = access(argv[i], F_OK);
+
+		if(j < 0){
+            fprintf(stderr, "The %s File does not exist\n", argv[i]);
+            continue;
+        }
+
+        f =access(argv[i], R_OK);
+
+		if(f < 0){
+            fprintf(stderr, "You don't have permission to read the %s file\n", argv[i]);
+            continue;
+        }
+
 		else{
-			cat(f, argv[i]);
+            fp = fopen(argv[i],"rt");
+			cat(argv[i]);
 			close(f);
 		}
 	}
-	exits(0);
+	exit(0);
 }
